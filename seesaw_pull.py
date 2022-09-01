@@ -2,7 +2,7 @@ import os
 import requests
 from os.path import exists
 
-headers = {'Authorization': ''}
+headers = {'Authorization': os.getenv('SEESAW')}
 
 children = [
     {
