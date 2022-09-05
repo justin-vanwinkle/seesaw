@@ -2,9 +2,9 @@ import sys
 import getopt
 import os
 import requests
+import time
 from os.path import exists
 
-# headers = {'Authorization': os.getenv('SEESAW')}
 headers = {}
 
 children = [
@@ -42,6 +42,7 @@ def main(argv):
 
         items = feed['response']['items']['objects']
         for item in items:
+            time.sleep(1)
             item_id = item['item']['item_id']
 
             item_url = f"https://app.seesaw.me/api/item_v2?item_id={item_id}"
@@ -52,7 +53,7 @@ def main(argv):
 
             pages = item_page['response']['item']['pages']['objects']
             for page in pages:
-                # time.sleep(1)
+                time.sleep(1)
                 # TODO -- add this to the image
                 # image_caption = ""
                 # if "caption" in page:
