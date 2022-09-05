@@ -36,4 +36,4 @@ jobs:
         run: |
           pip install -r requirements.txt
           SEESAW="${{secrets.SEESAW_BEARER}}"
-          python3 seesaw_pull.py
+          python3 seesaw_pull.py "${{secrets.SEESAW_BEARER}}"
