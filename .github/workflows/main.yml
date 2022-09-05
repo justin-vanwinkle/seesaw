@@ -31,5 +31,5 @@ jobs:
       # Runs a single command using the runners shell
       - name: Pull Images
         run: |
-          SEESAW = ${secret.SEESAW_BEARER}
+          SEESAW = ${{secrets.SEESAW_BEARER}}
           python3 seesaw_pull.py
