@@ -1,8 +1,11 @@
+import sys
+import getopt
 import os
 import requests
 from os.path import exists
 
-headers = {'Authorization': os.getenv('SEESAW')}
+# headers = {'Authorization': os.getenv('SEESAW')}
+headers = {}
 
 children = [
     {
@@ -27,51 +30,56 @@ def download_item(filename, url, create_date, child_name, item_type):
                 file.write(r.content)
                 os.utime(filepath, (create_date, create_date))
 
+def main(argv):
+    bearer_token = argv[0]
+    headers = {'Authorization': bearer_token}
+    
+    for child in children:
+        # might also need to get class feed
+        feed_url = f"https://app.seesaw.me/api/person/parent/class_feed?_bundle=me.see-saw.web_magiccam&_release=ss_web_prod_2022-08-26_18-59-33&_tz_offset=-14400&child_id={child['child_id']}&class_id={child['class_id']}&limit=1000"
+        r = requests.get(feed_url, headers=headers)
+        feed = r.json()
 
-for child in children:
-    # might also need to get class feed
-    feed_url = f"https://app.seesaw.me/api/person/parent/class_feed?_bundle=me.see-saw.web_magiccam&_release=ss_web_prod_2022-08-26_18-59-33&_tz_offset=-14400&child_id={child['child_id']}&class_id={child['class_id']}&limit=1000"
-    r = requests.get(feed_url, headers=headers)
-    feed = r.json()
+        items = feed['response']['items']['objects']
+        for item in items:
+            item_id = item['item']['item_id']
 
-    items = feed['response']['items']['objects']
-    for item in items:
-        item_id = item['item']['item_id']
+            item_url = f"https://app.seesaw.me/api/item_v2?item_id={item_id}"
+            r = requests.get(item_url, headers=headers)
+            item_page = r.json()
+            
+            create_date = item_page['response']['item']['create_date']
 
-        item_url = f"https://app.seesaw.me/api/item_v2?item_id={item_id}"
-        r = requests.get(item_url, headers=headers)
-        item_page = r.json()
-        
-        create_date = item_page['response']['item']['create_date']
+            pages = item_page['response']['item']['pages']['objects']
+            for page in pages:
+                # time.sleep(1)
+                # TODO -- add this to the image
+                # image_caption = ""
+                # if "caption" in page:
+                #     image_caption = page['caption']
 
-        pages = item_page['response']['item']['pages']['objects']
-        for page in pages:
-            # time.sleep(1)
-            # TODO -- add this to the image
-            # image_caption = ""
-            # if "caption" in page:
-            #     image_caption = page['caption']
-
-            # if image
-            if len(page['composite_image_map']['compositeImageMap']) == 0:
-                try:
-                    filename = f"{page['item_page_id']}.jpg"
-                    item_url = page['composite_image_url']
-                    download_item(filename, item_url, create_date, child["name"], item_type="image",)
-                except:
-                    print("failed on image")
-                    print(page)
-
-            else:
-                if (page['composite_image_map']['compositeImageMap'][0]['actions'][0]['action'] == "link"):
-                    print(f"Title: {page['composite_image_map']['compositeImageMap'][0]['actions'][0]['payload']['externalLinkDetails']['title']}")
-                    print(f"Link: {page['composite_image_map']['compositeImageMap'][0]['actions'][0]['payload']['destination']}")
-                    print(f"Caption: {page['caption']}")
-                    print("----------")
+                # if image
+                if len(page['composite_image_map']['compositeImageMap']) == 0:
+                    try:
+                        filename = f"{page['item_page_id']}.jpg"
+                        item_url = page['composite_image_url']
+                        download_item(filename, item_url, create_date, child["name"], item_type="image",)
+                    except:
+                        print("failed on image")
+                        print(page)
 
                 else:
-                    # this is a video
-                    filename = f"{page['item_page_id']}.mov"
-                    item_url = page['composite_image_map']['compositeImageMap'][0]['actions'][0]['payload']['videoSrc']
-                    download_item(filename, item_url, create_date, child["name"], item_type="video")
+                    if (page['composite_image_map']['compositeImageMap'][0]['actions'][0]['action'] == "link"):
+                        print(f"Title: {page['composite_image_map']['compositeImageMap'][0]['actions'][0]['payload']['externalLinkDetails']['title']}")
+                        print(f"Link: {page['composite_image_map']['compositeImageMap'][0]['actions'][0]['payload']['destination']}")
+                        print(f"Caption: {page['caption']}")
+                        print("----------")
 
+                    else:
+                        # this is a video
+                        filename = f"{page['item_page_id']}.mov"
+                        item_url = page['composite_image_map']['compositeImageMap'][0]['actions'][0]['payload']['videoSrc']
+                        download_item(filename, item_url, create_date, child["name"], item_type="video")
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
