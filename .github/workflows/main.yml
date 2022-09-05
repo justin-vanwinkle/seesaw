@@ -38,9 +38,16 @@ jobs:
           SEESAW="${{secrets.SEESAW_BEARER}}"
           python3 seesaw_pull.py "${{secrets.SEESAW_BEARER}}"
         
-      - name: Upload a Build Artifact
+      - name: Upload a Reed Artifact
         uses: actions/upload-artifact@v3.1.0
         with:
           name: reed
           path: ./reed
+          retention-days: 90
+
+      - name: Upload a Neely Artifact
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          name: neely
+          path: ./neely
           retention-days: 90
