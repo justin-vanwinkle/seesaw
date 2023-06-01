@@ -87,7 +87,7 @@ def main(argv):
                
             else:
                 print(item_page['response']['item']['items'].__dir__())
-                print(item_page['response']['item']['items']
+                print(item_page['response']['item']['items'])
                 
 if __name__ == "__main__":
     main(sys.argv[1:])
