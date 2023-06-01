@@ -84,7 +84,7 @@ def main(argv):
                             item_url = page['composite_image_map']['compositeImageMap'][0]['actions'][0]['payload']['videoSrc']
                             download_item(filename, item_url, create_date, child["name"], item_type="video")
                
-            else
+            else:
                 print(item_page['response']['item'].__dir__())
                 
 if __name__ == "__main__":
