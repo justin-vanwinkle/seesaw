@@ -86,7 +86,7 @@ def main(argv):
                             download_item(filename, item_url, create_date, child["name"], item_type="video")
                
             else:
-                print(item_page['response']['item']['items'].__dir__())
+                # print(item_page['response']['item'].__dir__())
                 print(item_page['response']['item']['items'])
                 
 if __name__ == "__main__":
