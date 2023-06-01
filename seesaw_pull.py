@@ -53,6 +53,7 @@ def main(argv):
 
             
             if hasattr(item_page['response']['item'], 'pages'):
+                print('processing page')
                 pages = item_page['response']['item']['pages']['objects']
                 for page in pages:
                     time.sleep(.5)
@@ -85,7 +86,8 @@ def main(argv):
                             download_item(filename, item_url, create_date, child["name"], item_type="video")
                
             else:
-                print(item_page['response']['item'].__dir__())
+                print(item_page['response']['item']['items'].__dir__())
+                print(item_page['response']['item']['items']
                 
 if __name__ == "__main__":
     main(sys.argv[1:])
